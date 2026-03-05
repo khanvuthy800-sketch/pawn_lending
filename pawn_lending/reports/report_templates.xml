@@ -1,0 +1,238 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <template id="report_pawn_ticket_document">
+        <t t-call="web.external_layout">
+            <div class="page">
+                <t t-set="item" t-value="doc.collateral_ids[:1]"/>
+                <t t-set="interest_amount" t-value="doc.total_interest_due"/>
+                <t t-set="payment_total" t-value="doc.principal_amount + interest_amount"/>
+
+                <div class="pawn-ticket">
+                    <div class="title">បង្កាន់ដៃបញ្ចាំ</div>
+                    <div class="sub-title">TICKET</div>
+
+                    <table>
+                        <tr>
+                            <td class="label">No Invoice</td>
+                            <td class="value fx-red"><span t-field="doc.name"/></td>
+                            <td class="label">Issue Date</td>
+                            <td class="value"><span t-field="doc.loan_date"/></td>
+                        </tr>
+                        <tr>
+                            <td class="label">Customer Name</td>
+                            <td class="value"><span t-field="doc.customer_id"/></td>
+                            <td class="label">Identity Card Number</td>
+                            <td class="value"><span t-esc="doc.customer_id.vat or '-'"/></td>
+                        </tr>
+                    </table>
+
+                    <table style="margin-top: 8px;">
+                        <tr><th colspan="3" class="section-title">2. Pawn Items</th></tr>
+                        <tr>
+                            <td class="label">Type</td>
+                            <td t-if="item" class="value"><span t-field="item.category"/></td>
+                            <td t-if="not item" class="value">-</td>
+                            <td rowspan="10" style="width: 230px;">
+                                <div class="small" style="font-weight: 700; margin-bottom: 4px;">Photo's Pawn Item</div>
+                                <div class="photo-box">
+                                    <img t-if="item and item.photo" t-att-src="image_data_uri(item.photo)" alt="Collateral Photo"/>
+                                    <span t-if="not (item and item.photo)" class="small">No photo</span>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="label">Name of Items</td>
+                            <td t-if="item" class="value"><span t-field="item.name"/></td>
+                            <td t-if="not item" class="value">-</td>
+                        </tr>
+                        <tr><td class="label">Year</td><td class="value">-</td></tr>
+                        <tr><td class="label">Colors</td><td class="value">-</td></tr>
+                        <tr><td class="label">Plate Number</td><td class="value">-</td></tr>
+                        <tr>
+                            <td class="label">Machine Number</td>
+                            <td t-if="item" class="value"><span t-field="item.serial_number"/></td>
+                            <td t-if="not item" class="value">-</td>
+                        </tr>
+                        <tr><td class="label">Frame Number</td><td class="value">-</td></tr>
+                        <tr><td class="label">First Issue Date ID</td><td class="value">-</td></tr>
+                        <tr><td class="label">Issue Date ID</td><td class="value">-</td></tr>
+                        <tr>
+                            <td class="label">Remarks</td>
+                            <td t-if="item" class="value"><span t-esc="item.description or '-'"/></td>
+                            <td t-if="not item" class="value">-</td>
+                        </tr>
+                    </table>
+
+                    <table style="margin-top: 8px;">
+                        <tr><th colspan="4" class="section-title">3. Pawn Information</th></tr>
+                        <tr>
+                            <td class="label">Start Date</td>
+                            <td class="value"><span t-field="doc.loan_date"/></td>
+                            <td class="label">Expired Date</td>
+                            <td class="value fx-red"><span t-field="doc.maturity_date"/></td>
+                        </tr>
+                        <tr>
+                            <td class="label">Number of Days</td>
+                            <td class="value"><span t-esc="(doc.maturity_date - doc.loan_date).days if doc.loan_date and doc.maturity_date else 0"/></td>
+                            <td class="label">Duration</td>
+                            <td class="value">1 month</td>
+                        </tr>
+                        <tr>
+                            <td class="label">Pawn Price</td>
+                            <td class="amount-blue"><span t-field="doc.principal_amount"/></td>
+                            <td class="label">Total Interest &amp; Services</td>
+                            <td class="value"><span t-esc="('%.2f' % doc.interest_rate)"/>%</td>
+                        </tr>
+                        <tr>
+                            <td class="label muted">Interest</td>
+                            <td class="value"><span t-field="doc.total_interest_due"/></td>
+                            <td class="amount-green"><span t-esc="interest_amount"/></td>
+                            <td class="amount-blue"><span t-esc="payment_total"/></td>
+                        </tr>
+                    </table>
+
+                    <table style="margin-top: 8px;">
+                        <tr>
+                            <td class="terms">
+                                <strong>4. Terms &amp; Conditions</strong><br/>
+                                *** Late payment penalty follows company policy and contract agreement.<br/>
+                                *** Customer must keep this ticket for payment / redemption process.<br/>
+                                *** If overdue and unpaid, collateral may be forfeited according to policy.
+                            </td>
+                            <td style="width: 95px; text-align: center; vertical-align: middle;">
+                                <div class="small muted">Penalty / Day</div>
+                                <div class="fx-red" style="font-size: 24px;">$<span t-esc="('%.2f' % (doc.penalty_rate or 0.0))"/></div>
+                            </td>
+                        </tr>
+                    </table>
+
+                    <table style="margin-top: 8px;">
+                        <tr>
+                            <td style="width: 35%;">
+                                <div class="small"><strong>Customer</strong></div>
+                                <div class="sign-box"/>
+                                <div class="small" style="text-align: center; margin-top: 4px;"><span t-field="doc.customer_id.name"/></div>
+                            </td>
+                            <td style="width: 30%; text-align: center;">Gender: □ Female   □ Male</td>
+                            <td style="width: 35%;">
+                                <div class="small"><strong>Evaluator</strong></div>
+                                <div class="sign-box"/>
+                                <div class="small" style="text-align: center; margin-top: 4px;"><span t-esc="doc.create_uid.name or 'Pawn Officer'"/></div>
+                            </td>
+                        </tr>
+                    </table>
+
+                    <div class="cut-line"/>
+
+                    <table>
+                        <tr><th colspan="4" class="section-title">RECEIPT</th></tr>
+                        <tr>
+                            <td class="label">Ticket No</td>
+                            <td class="value fx-red"><span t-field="doc.name"/></td>
+                            <td class="label">Customer</td>
+                            <td class="value"><span t-field="doc.customer_id"/></td>
+                        </tr>
+                        <tr>
+                            <td class="label">Phone</td>
+                            <td class="value"><span t-esc="doc.customer_id.phone or '-'"/></td>
+                            <td class="label">Due Date</td>
+                            <td class="value"><span t-field="doc.maturity_date"/></td>
+                        </tr>
+                        <tr>
+                            <td colspan="4">
+                                <span class="small">Address:</span> <span class="receipt-lines"/>
+                                <span class="small" style="margin-left: 10px;">ID:</span> <span class="receipt-lines" style="min-width:150px;"/>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td colspan="2" style="text-align:center;">
+                                <div class="small"><strong>Customer Signature</strong></div>
+                                <div class="sign-box"/>
+                            </td>
+                            <td colspan="2" style="text-align:center;">
+                                <div class="small"><strong>Staff Signature</strong></div>
+                                <div class="sign-box"/>
+                            </td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+        </t>
+    </template>
+
+    <template id="report_pawn_ticket">
+        <t t-call="web.html_container">
+            <t t-foreach="docs" t-as="doc">
+                <t t-call="pawn_lending.report_pawn_ticket_document"/>
+            </t>
+        </t>
+    </template>
+
+    <template id="report_payment_receipt_document">
+        <t t-call="web.external_layout">
+            <div class="page">
+                <h2>Payment Receipt</h2>
+                <p><strong>Receipt Date:</strong> <span t-field="doc.payment_date"/></p>
+                <p><strong>Contract:</strong> <span t-field="doc.contract_id.name"/></p>
+                <p><strong>Customer:</strong> <span t-field="doc.contract_id.customer_id"/></p>
+                <p><strong>Payment Type:</strong> <span t-field="doc.payment_type"/></p>
+                <p><strong>Amount:</strong> <span t-field="doc.amount"/></p>
+                <p><strong>Journal:</strong> <span t-field="doc.journal_id"/></p>
+                <p><strong>Journal Entry:</strong> <span t-field="doc.account_move_id.name"/></p>
+            </div>
+        </t>
+    </template>
+
+    <template id="report_payment_receipt">
+        <t t-call="web.html_container">
+            <t t-foreach="docs" t-as="doc">
+                <t t-call="pawn_lending.report_payment_receipt_document"/>
+            </t>
+        </t>
+    </template>
+
+    <template id="report_redemption_receipt_document">
+        <t t-call="web.external_layout">
+            <div class="page">
+                <h2>Redemption Receipt</h2>
+                <p><strong>Contract:</strong> <span t-field="doc.name"/></p>
+                <p><strong>Customer:</strong> <span t-field="doc.customer_id"/></p>
+                <p><strong>Redeemed On:</strong> <span t-field="doc.write_date"/></p>
+                <p><strong>Principal Settled:</strong> <span t-field="doc.principal_amount"/></p>
+                <p><strong>Total Paid Interest:</strong> <span t-field="doc.total_paid_interest"/></p>
+                <t t-set="penalty_paid" t-value="0.0"/>
+                <t t-foreach="doc.payment_ids" t-as="p">
+                    <t t-if="p.state == 'posted' and p.payment_type == 'penalty'">
+                        <t t-set="penalty_paid" t-value="penalty_paid + p.amount"/>
+                    </t>
+                </t>
+                <p><strong>Penalty Paid:</strong> <span t-esc="penalty_paid"/></p>
+                <h4>Released Collateral</h4>
+                <table class="table table-sm table-bordered">
+                    <thead>
+                        <tr>
+                            <th>Name</th>
+                            <th>Category</th>
+                            <th>Serial Number</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr t-foreach="doc.collateral_ids" t-as="line">
+                            <td><span t-field="line.name"/></td>
+                            <td><span t-field="line.category"/></td>
+                            <td><span t-field="line.serial_number"/></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </t>
+    </template>
+
+    <template id="report_redemption_receipt">
+        <t t-call="web.html_container">
+            <t t-foreach="docs" t-as="doc">
+                <t t-call="pawn_lending.report_redemption_receipt_document"/>
+            </t>
+        </t>
+    </template>
+</odoo>

@@ -1,0 +1,41 @@
+{
+    'name': 'Pawn Management',
+    'version': '19.0.1.0.0',
+    'summary': 'Manage pawn contracts, collateral, and payments',
+    'description': 'Pawn shop operations for loan against collateral with accounting and stock integration.',
+    'category': 'Accounting',
+    'author': 'Custom',
+    'license': 'LGPL-3',
+    'depends': ['base', 'web', 'contacts', 'account', 'stock', 'mail'],
+    'assets': {
+        'web.report_assets_common': [
+            'pawn_lending/static/src/scss/pawn_report.scss',
+        ],
+        'web.assets_backend': [
+            'pawn_lending/static/src/scss/pawn_dashboard.scss',
+            'pawn_lending/static/src/js/pawn_dashboard.js',
+            'pawn_lending/static/src/xml/pawn_dashboard_templates.xml',
+        ],
+    },
+    'data': [
+        'security/security.xml',
+        'security/ir.model.access.csv',
+        'data/sequence.xml',
+        'data/stock_location.xml',
+        'data/cron.xml',
+        'views/pawn_rule_profile_views.xml',
+        'views/pawn_collateral_views.xml',
+        'views/pawn_payment_views.xml',
+        'views/pawn_contract_views.xml',
+        'views/pawn_dashboard_views.xml',
+        'views/res_config_settings_views.xml',
+        'views/menus.xml',
+        'reports/report_templates.xml',
+        'reports/report_actions.xml',
+    ],
+    'demo': [
+        'demo/demo.xml',
+    ],
+    'application': True,
+    'installable': True,
+}

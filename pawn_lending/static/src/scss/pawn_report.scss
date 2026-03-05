@@ -1,0 +1,51 @@
+@font-face {
+    font-family: 'Noto Sans Khmer Local';
+    src: url('/pawn_lending/static/src/fonts/Noto_Sans_Khmer/static/NotoSansKhmer-Regular.ttf') format('truetype');
+    font-weight: normal;
+    font-style: normal;
+}
+
+@font-face {
+    font-family: 'Noto Sans Khmer Local';
+    src: url('/pawn_lending/static/src/fonts/Noto_Sans_Khmer/static/NotoSansKhmer-Bold.ttf') format('truetype');
+    font-weight: 700;
+    font-style: normal;
+}
+
+.pawn-ticket {
+    font-family: 'Noto Sans Khmer Local', 'Noto Sans Khmer', 'DejaVu Sans', sans-serif;
+}
+
+.pawn-ticket table { width: 100%; border-collapse: collapse; font-size: 12px; }
+.pawn-ticket td,
+.pawn-ticket th { border: 1px solid #111; padding: 3px 5px; vertical-align: middle; }
+.pawn-ticket .title { font-size: 20px; font-weight: 800; text-align: center; line-height: 1.1; }
+.pawn-ticket .sub-title { font-size: 14px; font-weight: 700; text-align: center; margin-bottom: 6px; }
+.pawn-ticket .section-title { font-weight: 800; background: #f0f0f0; }
+.pawn-ticket .label { width: 23%; font-weight: 700; background: #fbfbfb; }
+.pawn-ticket .value { font-weight: 700; text-align: center; }
+.pawn-ticket .amount-blue { color: #1b4fa0; font-size: 28px; font-weight: 800; text-align: center; }
+.pawn-ticket .amount-green { color: #1f6b27; font-size: 24px; font-weight: 800; text-align: center; }
+.pawn-ticket .muted { color: #666; }
+.pawn-ticket .terms { background: #ffeaea; color: #a71d1d; font-size: 11px; line-height: 1.35; }
+.pawn-ticket .cut-line { border-top: 2px dashed #000; margin: 8px 0; }
+.pawn-ticket .small { font-size: 11px; }
+.pawn-ticket .sign-box { height: 64px; border: 1px solid #111; margin-top: 4px; }
+.pawn-ticket .photo-box {
+    width: 215px;
+    height: 215px;
+    border: 1px solid #333;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    margin: 0 auto;
+}
+.pawn-ticket .photo-box img { max-width: 100%; max-height: 100%; }
+.pawn-ticket .fx-red { color: #be1f1f; font-weight: 800; }
+.pawn-ticket .receipt-lines {
+    line-height: 1.8;
+    border-bottom: 1px dotted #444;
+    display: inline-block;
+    min-width: 220px;
+}

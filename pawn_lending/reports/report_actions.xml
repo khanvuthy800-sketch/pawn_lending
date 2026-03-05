@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <record id="action_report_pawn_ticket" model="ir.actions.report">
+        <field name="name">Pawn Ticket</field>
+        <field name="model">pawn.contract</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">pawn_lending.report_pawn_ticket</field>
+        <field name="report_file">pawn_lending.report_pawn_ticket</field>
+        <field name="binding_model_id" ref="model_pawn_contract"/>
+        <field name="binding_type">report</field>
+        <field name="print_report_name">'Pawn Ticket - %s' % object.name</field>
+    </record>
+
+    <record id="action_report_payment_receipt" model="ir.actions.report">
+        <field name="name">Payment Receipt</field>
+        <field name="model">pawn.payment</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">pawn_lending.report_payment_receipt</field>
+        <field name="report_file">pawn_lending.report_payment_receipt</field>
+        <field name="binding_model_id" ref="model_pawn_payment"/>
+        <field name="binding_type">report</field>
+        <field name="print_report_name">'Payment Receipt - %s' % object.contract_id.name</field>
+    </record>
+
+    <record id="action_report_redemption_receipt" model="ir.actions.report">
+        <field name="name">Redemption Receipt</field>
+        <field name="model">pawn.contract</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">pawn_lending.report_redemption_receipt</field>
+        <field name="report_file">pawn_lending.report_redemption_receipt</field>
+        <field name="binding_model_id" ref="model_pawn_contract"/>
+        <field name="binding_type">report</field>
+        <field name="print_report_name">'Redemption Receipt - %s' % object.name</field>
+    </record>
+</odoo>

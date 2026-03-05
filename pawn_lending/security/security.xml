@@ -1,0 +1,169 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <record id="privilege_pawn_management" model="res.groups.privilege">
+        <field name="name">Pawn Management</field>
+        <field name="category_id" ref="base.module_category_sales"/>
+    </record>
+
+    <record id="group_pawn_officer" model="res.groups">
+        <field name="name">Pawn Officer</field>
+        <field name="privilege_id" ref="pawn_lending.privilege_pawn_management"/>
+    </record>
+
+    <record id="group_pawn_manager" model="res.groups">
+        <field name="name">Pawn Manager</field>
+        <field name="privilege_id" ref="pawn_lending.privilege_pawn_management"/>
+        <field name="implied_ids" eval="[Command.link(ref('pawn_lending.group_pawn_officer'))]"/>
+    </record>
+
+    <!-- ===== pawn.contract Rules ===== -->
+
+    <!-- Multi-company: restrict contracts to the user's allowed companies -->
+    <record id="rule_pawn_contract_company" model="ir.rule">
+        <field name="name">Pawn Contract: Multi-Company</field>
+        <field name="model_id" ref="model_pawn_contract"/>
+        <field name="domain_force">['|', ('company_id', '=', False), ('company_id', 'in', company_ids)]</field>
+        <field name="perm_read" eval="1"/>
+        <field name="perm_write" eval="1"/>
+        <field name="perm_create" eval="1"/>
+        <field name="perm_unlink" eval="1"/>
+    </record>
+
+    <!-- Officer: read any contract within their company -->
+    <record id="rule_pawn_contract_officer_read_all" model="ir.rule">
+        <field name="name">Pawn Contract: Officer Read All</field>
+        <field name="model_id" ref="model_pawn_contract"/>
+        <field name="domain_force">[(1, '=', 1)]</field>
+        <field name="groups" eval="[(4, ref('pawn_lending.group_pawn_officer'))]"/>
+        <field name="perm_read" eval="1"/>
+        <field name="perm_write" eval="0"/>
+        <field name="perm_create" eval="0"/>
+        <field name="perm_unlink" eval="0"/>
+    </record>
+
+    <!-- Officer: write/create only draft contracts -->
+    <record id="rule_pawn_contract_officer_draft_edit" model="ir.rule">
+        <field name="name">Pawn Contract: Officer Write Draft Only</field>
+        <field name="model_id" ref="model_pawn_contract"/>
+        <field name="domain_force">[('state', '=', 'draft')]</field>
+        <field name="groups" eval="[(4, ref('pawn_lending.group_pawn_officer'))]"/>
+        <field name="perm_read" eval="0"/>
+        <field name="perm_write" eval="1"/>
+        <field name="perm_create" eval="1"/>
+        <field name="perm_unlink" eval="0"/>
+    </record>
+
+    <!-- Manager: full access to all contracts -->
+    <record id="rule_pawn_contract_manager_all" model="ir.rule">
+        <field name="name">Pawn Contract: Manager Full Access</field>
+        <field name="model_id" ref="model_pawn_contract"/>
+        <field name="domain_force">[(1, '=', 1)]</field>
+        <field name="groups" eval="[(4, ref('pawn_lending.group_pawn_manager'))]"/>
+        <field name="perm_read" eval="1"/>
+        <field name="perm_write" eval="1"/>
+        <field name="perm_create" eval="1"/>
+        <field name="perm_unlink" eval="1"/>
+    </record>
+
+    <!-- ===== pawn.collateral Rules ===== -->
+
+    <!-- Officer: read all collateral -->
+    <record id="rule_pawn_collateral_officer_read_all" model="ir.rule">
+        <field name="name">Pawn Collateral: Officer Read All</field>
+        <field name="model_id" ref="model_pawn_collateral"/>
+        <field name="domain_force">[(1, '=', 1)]</field>
+        <field name="groups" eval="[(4, ref('pawn_lending.group_pawn_officer'))]"/>
+        <field name="perm_read" eval="1"/>
+        <field name="perm_write" eval="0"/>
+        <field name="perm_create" eval="0"/>
+        <field name="perm_unlink" eval="0"/>
+    </record>
+
+    <!-- Officer: write/create collateral only on draft contracts -->
+    <record id="rule_pawn_collateral_officer_draft_edit" model="ir.rule">
+        <field name="name">Pawn Collateral: Officer Write on Draft Contracts</field>
+        <field name="model_id" ref="model_pawn_collateral"/>
+        <field name="domain_force">[('contract_id.state', '=', 'draft')]</field>
+        <field name="groups" eval="[(4, ref('pawn_lending.group_pawn_officer'))]"/>
+        <field name="perm_read" eval="0"/>
+        <field name="perm_write" eval="1"/>
+        <field name="perm_create" eval="1"/>
+        <field name="perm_unlink" eval="0"/>
+    </record>
+
+    <!-- Manager: full access to all collateral -->
+    <record id="rule_pawn_collateral_manager_all" model="ir.rule">
+        <field name="name">Pawn Collateral: Manager Full Access</field>
+        <field name="model_id" ref="model_pawn_collateral"/>
+        <field name="domain_force">[(1, '=', 1)]</field>
+        <field name="groups" eval="[(4, ref('pawn_lending.group_pawn_manager'))]"/>
+        <field name="perm_read" eval="1"/>
+        <field name="perm_write" eval="1"/>
+        <field name="perm_create" eval="1"/>
+        <field name="perm_unlink" eval="1"/>
+    </record>
+
+    <!-- ===== pawn.payment Rules ===== -->
+
+    <!-- Officer: read all payments -->
+    <record id="rule_pawn_payment_officer_read_all" model="ir.rule">
+        <field name="name">Pawn Payment: Officer Read All</field>
+        <field name="model_id" ref="model_pawn_payment"/>
+        <field name="domain_force">[(1, '=', 1)]</field>
+        <field name="groups" eval="[(4, ref('pawn_lending.group_pawn_officer'))]"/>
+        <field name="perm_read" eval="1"/>
+        <field name="perm_write" eval="0"/>
+        <field name="perm_create" eval="0"/>
+        <field name="perm_unlink" eval="0"/>
+    </record>
+
+    <!-- Officer: write/create draft payments on active contracts -->
+    <record id="rule_pawn_payment_officer_draft_edit" model="ir.rule">
+        <field name="name">Pawn Payment: Officer Write Draft Payments on Active Contracts</field>
+        <field name="model_id" ref="model_pawn_payment"/>
+        <field name="domain_force">[('state', '=', 'draft'), ('contract_id.state', 'in', ['active', 'overdue'])]</field>
+        <field name="groups" eval="[(4, ref('pawn_lending.group_pawn_officer'))]"/>
+        <field name="perm_read" eval="0"/>
+        <field name="perm_write" eval="1"/>
+        <field name="perm_create" eval="1"/>
+        <field name="perm_unlink" eval="0"/>
+    </record>
+
+    <!-- Manager: full access to all payments -->
+    <record id="rule_pawn_payment_manager_all" model="ir.rule">
+        <field name="name">Pawn Payment: Manager Full Access</field>
+        <field name="model_id" ref="model_pawn_payment"/>
+        <field name="domain_force">[(1, '=', 1)]</field>
+        <field name="groups" eval="[(4, ref('pawn_lending.group_pawn_manager'))]"/>
+        <field name="perm_read" eval="1"/>
+        <field name="perm_write" eval="1"/>
+        <field name="perm_create" eval="1"/>
+        <field name="perm_unlink" eval="1"/>
+    </record>
+
+    <!-- ===== pawn.rule.profile Rules ===== -->
+
+    <!-- Officer: read-only access to rule profiles -->
+    <record id="rule_pawn_rule_profile_officer_read" model="ir.rule">
+        <field name="name">Pawn Rule Profile: Officer Read Only</field>
+        <field name="model_id" ref="model_pawn_rule_profile"/>
+        <field name="domain_force">[(1, '=', 1)]</field>
+        <field name="groups" eval="[(4, ref('pawn_lending.group_pawn_officer'))]"/>
+        <field name="perm_read" eval="1"/>
+        <field name="perm_write" eval="0"/>
+        <field name="perm_create" eval="0"/>
+        <field name="perm_unlink" eval="0"/>
+    </record>
+
+    <!-- Manager: full access to rule profiles -->
+    <record id="rule_pawn_rule_profile_manager_all" model="ir.rule">
+        <field name="name">Pawn Rule Profile: Manager Full Access</field>
+        <field name="model_id" ref="model_pawn_rule_profile"/>
+        <field name="domain_force">[(1, '=', 1)]</field>
+        <field name="groups" eval="[(4, ref('pawn_lending.group_pawn_manager'))]"/>
+        <field name="perm_read" eval="1"/>
+        <field name="perm_write" eval="1"/>
+        <field name="perm_create" eval="1"/>
+        <field name="perm_unlink" eval="1"/>
+    </record>
+</odoo>

@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <menuitem
+        id="menu_pawn_root"
+        name="Pawn Management"
+        sequence="30"
+        web_icon="pawn_lending,static/description/icon.png"
+        groups="pawn_lending.group_pawn_officer,pawn_lending.group_pawn_manager"
+    />
+    <menuitem id="menu_pawn_dashboard" name="Dashboard" parent="menu_pawn_root" action="action_pawn_dashboard_client" sequence="5" groups="pawn_lending.group_pawn_manager"/>
+    <menuitem id="menu_pawn_contract" name="Contracts" parent="menu_pawn_root" action="action_pawn_contract" sequence="10" groups="pawn_lending.group_pawn_officer,pawn_lending.group_pawn_manager"/>
+    <menuitem id="menu_pawn_collateral" name="Collaterals" parent="menu_pawn_root" action="action_pawn_collateral" sequence="20" groups="pawn_lending.group_pawn_officer,pawn_lending.group_pawn_manager"/>
+    <menuitem id="menu_pawn_payment" name="Payments" parent="menu_pawn_root" action="action_pawn_payment" sequence="30" groups="pawn_lending.group_pawn_officer,pawn_lending.group_pawn_manager"/>
+    <menuitem id="menu_pawn_rule_profile" name="Rule Profiles" parent="menu_pawn_root" action="action_pawn_rule_profile" sequence="40" groups="pawn_lending.group_pawn_manager"/>
+    <menuitem id="menu_pawn_settings" name="Settings" parent="menu_pawn_root" action="action_pawn_settings" sequence="90" groups="pawn_lending.group_pawn_manager"/>
+</odoo>

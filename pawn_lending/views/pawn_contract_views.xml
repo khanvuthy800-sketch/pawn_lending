@@ -1,0 +1,176 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <record id="view_pawn_contract_list" model="ir.ui.view">
+        <field name="name">pawn.contract.list</field>
+        <field name="model">pawn.contract</field>
+        <field name="arch" type="xml">
+            <list>
+                <field name="name"/>
+                <field name="customer_id"/>
+                <field name="principal_amount"/>
+                <field name="loan_date"/>
+                <field name="maturity_date"/>
+                <field name="state"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_pawn_contract_kanban" model="ir.ui.view">
+        <field name="name">pawn.contract.kanban</field>
+        <field name="model">pawn.contract</field>
+        <field name="arch" type="xml">
+            <kanban default_group_by="state">
+                <field name="name"/>
+                <field name="customer_id"/>
+                <field name="principal_amount"/>
+                <field name="maturity_date"/>
+                <field name="state"/>
+                <templates>
+                    <t t-name="card">
+                        <div class="oe_kanban_global_click">
+                            <div class="fw-bold"><field name="name"/></div>
+                            <div><field name="customer_id"/></div>
+                            <div><field name="principal_amount"/></div>
+                            <div class="text-muted"><field name="maturity_date"/></div>
+                        </div>
+                    </t>
+                </templates>
+            </kanban>
+        </field>
+    </record>
+
+    <record id="view_pawn_contract_search" model="ir.ui.view">
+        <field name="name">pawn.contract.search</field>
+        <field name="model">pawn.contract</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="name"/>
+                <field name="customer_id"/>
+                <field name="state"/>
+                <filter name="filter_active" string="Active" domain="[('state', '=', 'active')]"/>
+                <filter name="filter_overdue" string="Overdue" domain="[('state', '=', 'overdue')]"/>
+                <filter
+                    name="filter_due_today"
+                    string="Due Today"
+                    domain="[('maturity_date', '=', context_today().strftime('%Y-%m-%d'))]"
+                />
+                <filter name="filter_forfeited" string="Forfeited" domain="[('state', '=', 'forfeited')]"/>
+                <separator/>
+                <filter name="group_state" string="Group by State" domain="[]" context="{'group_by': 'state'}"/>
+                <filter name="group_customer" string="Group by Customer" domain="[]" context="{'group_by': 'customer_id'}"/>
+            </search>
+        </field>
+    </record>
+
+    <record id="view_pawn_contract_form" model="ir.ui.view">
+        <field name="name">pawn.contract.form</field>
+        <field name="model">pawn.contract</field>
+        <field name="arch" type="xml">
+            <form string="Pawn Contract">
+                <header>
+                    <button name="action_approve" type="object" string="Approve" class="btn-primary" groups="pawn_lending.group_pawn_manager" invisible="state != 'draft'"/>
+                    <button name="action_disburse" type="object" string="Disburse" class="btn-primary" groups="pawn_lending.group_pawn_manager" invisible="state != 'approved'"/>
+                    <button name="action_renew" type="object" string="Renew" groups="pawn_lending.group_pawn_manager" invisible="state not in ['active', 'overdue']"/>
+                    <button name="action_redeem" type="object" string="Redeem" groups="pawn_lending.group_pawn_manager" invisible="state not in ['active', 'overdue', 'renewed']"/>
+                    <button name="action_forfeit" type="object" string="Forfeit" groups="pawn_lending.group_pawn_manager" invisible="state not in ['active', 'overdue', 'renewed']"/>
+                    <button name="action_close" type="object" string="Close" groups="pawn_lending.group_pawn_manager" invisible="state not in ['redeemed', 'forfeited']"/>
+                    <button name="action_print_ticket" type="object" string="Print Pawn Ticket" invisible="state == 'draft'"/>
+                    <button name="action_print_redemption_receipt" type="object" string="Print Redemption Receipt" invisible="state not in ['redeemed', 'closed']"/>
+                    <field name="state" widget="statusbar" statusbar_visible="draft,approved,active,overdue,renewed,redeemed,forfeited,closed"/>
+                </header>
+                <sheet>
+                    <div class="oe_button_box" name="button_box">
+                        <button name="action_view_payments" type="object" class="oe_stat_button" icon="fa-money">
+                            <field name="payment_count" widget="statinfo" string="Payments"/>
+                        </button>
+                        <button name="action_view_moves" type="object" class="oe_stat_button" icon="fa-book">
+                            <field name="move_count" widget="statinfo" string="Journal Entries"/>
+                        </button>
+                        <button name="action_view_collateral" type="object" class="oe_stat_button" icon="fa-archive">
+                            <field name="collateral_count" widget="statinfo" string="Collateral"/>
+                        </button>
+                    </div>
+
+                    <group>
+                        <group>
+                            <field name="name" readonly="1"/>
+                            <field name="customer_id" readonly="state != 'draft'"/>
+                            <field name="guarantor_id" readonly="state != 'draft'"/>
+                            <field name="rule_profile_id" readonly="state != 'draft'"/>
+                        </group>
+                        <group>
+                            <field name="loan_date" readonly="state != 'draft'"/>
+                            <field name="maturity_date" readonly="state != 'draft'"/>
+                            <field name="grace_days" readonly="state != 'draft'"/>
+                            <field name="company_id" groups="base.group_multi_company"/>
+                        </group>
+                    </group>
+
+                    <group>
+                        <group>
+                            <field name="appraised_value" readonly="1"/>
+                            <field name="principal_amount" readonly="state != 'draft'"/>
+                            <field name="interest_rate" readonly="state != 'draft'"/>
+                            <field name="penalty_rate" readonly="state != 'draft'"/>
+                        </group>
+                        <group>
+                            <field name="total_interest_due" readonly="1"/>
+                            <field name="total_paid_interest" readonly="1"/>
+                            <field name="outstanding_principal" readonly="1"/>
+                            <field name="penalty_amount" readonly="1"/>
+                        </group>
+                    </group>
+
+                    <notebook>
+                        <page string="Collateral">
+                            <field name="collateral_ids" readonly="state != 'draft'">
+                                <list editable="bottom">
+                                    <field name="product_id"/>
+                                    <field name="name"/>
+                                    <field name="category"/>
+                                    <field name="estimated_value"/>
+                                    <field name="serial_number"/>
+                                </list>
+                                <form>
+                                    <group>
+                                        <group>
+                                            <field name="product_id"/>
+                                            <field name="name"/>
+                                            <field name="category"/>
+                                            <field name="estimated_value"/>
+                                            <field name="serial_number"/>
+                                        </group>
+                                        <group>
+                                            <field name="photo" widget="image" class="oe_avatar"/>
+                                            <field name="description"/>
+                                        </group>
+                                    </group>
+                                </form>
+                            </field>
+                        </page>
+                        <page string="Payments">
+                            <field name="payment_ids" readonly="1">
+                                <list>
+                                    <field name="payment_date"/>
+                                    <field name="payment_type"/>
+                                    <field name="amount"/>
+                                    <field name="state"/>
+                                    <field name="account_move_id"/>
+                                </list>
+                            </field>
+                        </page>
+                    </notebook>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_pawn_contract" model="ir.actions.act_window">
+        <field name="name">Pawn Contracts</field>
+        <field name="res_model">pawn.contract</field>
+        <field name="view_mode">list,kanban,form</field>
+        <field name="search_view_id" ref="view_pawn_contract_search"/>
+        <field name="context">{'default_state': 'draft'}</field>
+    </record>
+</odoo>

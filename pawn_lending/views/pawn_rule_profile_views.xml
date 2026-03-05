@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <record id="view_pawn_rule_profile_list" model="ir.ui.view">
+        <field name="name">pawn.rule.profile.list</field>
+        <field name="model">pawn.rule.profile</field>
+        <field name="arch" type="xml">
+            <list>
+                <field name="name"/>
+                <field name="interest_type"/>
+                <field name="interest_rate"/>
+                <field name="penalty_rate"/>
+                <field name="max_ltv"/>
+                <field name="grace_days"/>
+                <field name="active"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_pawn_rule_profile_form" model="ir.ui.view">
+        <field name="name">pawn.rule.profile.form</field>
+        <field name="model">pawn.rule.profile</field>
+        <field name="arch" type="xml">
+            <form string="Rule Profile">
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="name"/>
+                            <field name="interest_type"/>
+                            <field name="interest_rate"/>
+                        </group>
+                        <group>
+                            <field name="penalty_rate"/>
+                            <field name="max_ltv"/>
+                            <field name="grace_days"/>
+                            <field name="active"/>
+                        </group>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_pawn_rule_profile" model="ir.actions.act_window">
+        <field name="name">Rule Profiles</field>
+        <field name="res_model">pawn.rule.profile</field>
+        <field name="view_mode">list,form</field>
+    </record>
+</odoo>

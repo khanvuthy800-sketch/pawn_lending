@@ -1,0 +1,284 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates xml:space="preserve">
+    <t t-name="pawn_lending.PawnDashboard">
+        <div class="o_pawn_dash" t-if="!state.loading and state.data">
+
+            <div class="pd-filter-bar">
+                <span class="pd-filter-label"><i class="fa fa-filter me-1"/>Filter by Date</span>
+                <div class="pd-filter-inputs">
+                    <label>From</label>
+                    <input type="date" class="pd-date-input" t-att-value="state.dateFrom" t-on-change="onChangeDateFrom"/>
+                    <label>To</label>
+                    <input type="date" class="pd-date-input" t-att-value="state.dateTo" t-on-change="onChangeDateTo"/>
+                    <button class="pd-btn-apply" t-on-click="applyFilter"><i class="fa fa-search me-1"/>Apply</button>
+                    <button class="pd-btn-clear" t-on-click="clearFilter" t-if="state.dateFrom or state.dateTo"><i class="fa fa-times me-1"/>Clear</button>
+                </div>
+            </div>
+            <div class="pd-section"><i class="fa fa-bar-chart me-2"/>Operational Metrics</div>
+            <div class="pd-grid-four dark-metrics">
+                <div class="pd-metric-dark">
+                    <div class="md-head">
+                        <div class="k">Total Customers</div>
+                        <i class="fa fa-users icon-pink"/>
+                    </div>
+                    <div class="v" t-esc="state.data.operational_metrics.total_customers"/>
+                    <div class="d up"><i class="fa fa-line-chart me-1"/> +<t t-esc="state.data.operational_metrics.new_customers_this_month"/> vs last month</div>
+                </div>
+                <div class="pd-metric-dark">
+                    <div class="md-head">
+                        <div class="k">Avg. Contract Duration</div>
+                        <i class="fa fa-clock-o icon-teal"/>
+                    </div>
+                    <div class="v"><t t-esc="state.data.operational_metrics.average_contract_duration"/> <span class="unit">days</span></div>
+                    <div class="d up"><i class="fa fa-line-chart me-1"/> +0 days vs last month</div>
+                </div>
+                <div class="pd-metric-dark">
+                    <div class="md-head">
+                        <div class="k">Inventory Value</div>
+                        <i class="fa fa-archive icon-pink"/>
+                    </div>
+                    <div class="v" t-esc="fmtMoney(state.data.operational_metrics.inventory_value)"/>
+                    <div class="d" t-att-class="state.data.operational_metrics.inventory_change_pct &gt;= 0 ? 'd up' : 'd down'">
+                        <i t-att-class="state.data.operational_metrics.inventory_change_pct &gt;= 0 ? 'fa fa-line-chart me-1' : 'fa fa-line-chart fa-flip-vertical me-1'"/>
+                        <t t-if="state.data.operational_metrics.inventory_change_pct &gt;= 0">+</t><t t-esc="state.data.operational_metrics.inventory_change_pct"/>% vs last month
+                    </div>
+                </div>
+                <div class="pd-metric-dark">
+                    <div class="md-head">
+                        <div class="k">Forfeit Rate</div>
+                        <i class="fa fa-exclamation-triangle icon-yellow"/>
+                    </div>
+                    <div class="v"><t t-esc="state.data.operational_metrics.forfeit_rate"/>%</div>
+                    <div class="d" t-att-class="state.data.operational_metrics.forfeit_rate_change &lt;= 0 ? 'd up' : 'd down'">
+                        <i t-att-class="state.data.operational_metrics.forfeit_rate_change &lt;= 0 ? 'fa fa-line-chart fa-flip-vertical me-1' : 'fa fa-line-chart me-1'"/>
+                        <t t-if="state.data.operational_metrics.forfeit_rate_change &gt; 0">+</t><t t-esc="state.data.operational_metrics.forfeit_rate_change"/>% vs last month
+                    </div>
+                </div>
+            </div>
+
+            <div class="pd-grid-two">
+                <div class="pd-card">
+                    <div class="pd-card-head">
+                        <h3><i class="fa fa-line-chart me-2"/>Monthly Revenue Trend</h3>
+                        <select t-on-change="onChangeRevenuePeriod" t-att-value="state.revenuePeriod">
+                            <option value="3m">Last 3 Months</option>
+                            <option value="6m">Last 6 Months</option>
+                            <option value="12m">Last 12 Months</option>
+                        </select>
+                    </div>
+                    <div class="pd-legend">
+                        <span><i class="dot pink"/>Interest</span>
+                        <span><i class="dot orange"/>Penalties</span>
+                    </div>
+                    <div class="pd-chart-wrap">
+                        <div class="pd-y-axis">
+                            <t t-foreach="revenueYLabels" t-as="yl" t-key="yl.val">
+                                <span t-esc="yl.label"/>
+                            </t>
+                        </div>
+                        <div class="pd-chart-col">
+                            <svg class="pd-line" viewBox="0 0 520 180" preserveAspectRatio="none">
+                                <polyline t-att-points="revenueChartPointsInterest" class="line-pink"/>
+                                <polyline t-att-points="revenueChartPointsPenalties" class="line-orange"/>
+                            </svg>
+                            <div class="pd-labels">
+                                <t t-foreach="state.data.monthly_revenue.labels" t-as="m" t-key="m"><span t-esc="m"/></t>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="pd-card">
+                    <div class="pd-card-head">
+                        <h3><i class="fa fa-pie-chart me-2"/>Contract Status Distribution</h3>
+                    </div>
+                    <div class="pd-donut-wrap">
+                        <div class="pd-donut" t-att-style="statusConicStyle"><span/></div>
+                        <div class="pd-status-list">
+                            <t t-foreach="statusRows" t-as="s" t-key="s.label">
+                                <div class="pd-status-row">
+                                    <span><i class="dot" t-att-style="'background:' + s.color"/> <t t-esc="s.label"/></span>
+                                    <b t-esc="s.value"/>
+                                </div>
+                            </t>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="pd-grid-two">
+                <div class="pd-card">
+                    <div class="pd-card-head">
+                        <h3><i class="fa fa-cubes me-2"/>Collateral Categories</h3>
+                    </div>
+                    <t t-foreach="collateralRows" t-as="c" t-key="c.label">
+                        <div class="pd-bar-row">
+                            <div class="lbl" t-esc="c.label"/>
+                            <div class="bar-bg">
+                                <div class="bar" t-att-style="'width:' + c.width + '%; background:' + c.color"/>
+                            </div>
+                            <div class="val" t-esc="c.value"/>
+                        </div>
+                    </t>
+                </div>
+
+                <div class="pd-card">
+                    <div class="pd-card-head">
+                        <h3><i class="fa fa-bar-chart me-2"/>Daily Transactions</h3>
+                        <select t-on-change="onChangeTransactionPeriod" t-att-value="state.transactionPeriod">
+                            <option value="week">This Week</option>
+                            <option value="month">Last 30 Days</option>
+                        </select>
+                    </div>
+                    <div class="pd-legend">
+                        <span><i class="dot pink"/>New Loans</span>
+                        <span><i class="dot green"/>Repayments</span>
+                    </div>
+                    <div class="pd-chart-wrap">
+                        <div class="pd-y-axis pd-y-bars">
+                            <t t-foreach="dailyYLabels" t-as="yl" t-key="yl.val">
+                                <span t-esc="yl.label"/>
+                            </t>
+                        </div>
+                        <div class="pd-bars">
+                            <t t-foreach="dailyRows" t-as="d" t-key="d.label">
+                                <div class="pd-day-col">
+                                    <div class="bars">
+                                        <span class="b pink" t-att-style="'height:' + d.loansHeight + '%'"/>
+                                        <span class="b green" t-att-style="'height:' + d.repaysHeight + '%'"/>
+                                    </div>
+                                    <div class="day" t-esc="d.label"/>
+                                </div>
+                            </t>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Due Today -->
+            <div class="pd-grid-two">
+                <div class="pd-card">
+                    <div class="pd-card-head">
+                        <h3><i class="fa fa-calendar-check-o me-2 icon-teal"/>Due Today
+                            <span class="pd-count-badge pd-badge-today" t-esc="state.data.due_today.length"/>
+                        </h3>
+                        <button class="btn-view-all" t-on-click="openDueToday">
+                            <i class="fa fa-eye me-1"/>View All
+                        </button>
+                    </div>
+                    <t t-if="!state.data.due_today.length">
+                        <div class="pd-empty-state"><i class="fa fa-check-circle me-2"/>No contracts due today</div>
+                    </t>
+                    <table class="pd-table" t-if="state.data.due_today.length">
+                        <thead>
+                            <tr>
+                                <th>Contract</th>
+                                <th>Customer</th>
+                                <th>Outstanding</th>
+                                <th>Interest Due</th>
+                                <th>Status</th>
+                                <th></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr t-foreach="state.data.due_today" t-as="r" t-key="r.id">
+                                <td t-esc="r.contract"/>
+                                <td t-esc="r.customer"/>
+                                <td t-esc="fmtMoney(r.outstanding_principal)"/>
+                                <td t-esc="fmtMoney(r.total_interest_due)"/>
+                                <td><span t-att-class="statusClass(r.status)" t-esc="capitalize(r.status)"/></td>
+                                <td>
+                                    <button class="eye" t-on-click="() => this.openContract(r.id)">
+                                        <i class="fa fa-eye"/>
+                                    </button>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Late Customers -->
+                <div class="pd-card">
+                    <div class="pd-card-head">
+                        <h3><i class="fa fa-exclamation-circle me-2 icon-pink"/>Late Customers
+                            <span class="pd-count-badge pd-badge-late" t-esc="state.data.late_customers.length"/>
+                        </h3>
+                        <button class="btn-view-all" t-on-click="openLateCustomers">
+                            <i class="fa fa-eye me-1"/>View All
+                        </button>
+                    </div>
+                    <t t-if="!state.data.late_customers.length">
+                        <div class="pd-empty-state"><i class="fa fa-check-circle me-2"/>No overdue customers</div>
+                    </t>
+                    <table class="pd-table" t-if="state.data.late_customers.length">
+                        <thead>
+                            <tr>
+                                <th>Contract</th>
+                                <th>Customer</th>
+                                <th>Outstanding</th>
+                                <th>Penalty</th>
+                                <th>Days Late</th>
+                                <th></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr t-foreach="state.data.late_customers" t-as="r" t-key="r.id">
+                                <td t-esc="r.contract"/>
+                                <td t-esc="r.customer"/>
+                                <td t-esc="fmtMoney(r.outstanding_principal)"/>
+                                <td t-esc="fmtMoney(r.penalty_amount)"/>
+                                <td><span class="pd-days-late" t-esc="r.overdue_days + 'd'"/></td>
+                                <td>
+                                    <button class="eye" t-on-click="() => this.openContract(r.id)">
+                                        <i class="fa fa-eye"/>
+                                    </button>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div class="pd-card">
+                <div class="pd-card-head">
+                    <h3><i class="fa fa-list me-2"/>Recent Contracts</h3>
+                    <button class="btn-view-all" t-on-click="openAllContracts">
+                        <i class="fa fa-eye me-1"/>View All
+                    </button>
+                </div>
+                <table class="pd-table">
+                    <thead>
+                        <tr>
+                            <th>Contract ID</th>
+                            <th>Customer</th>
+                            <th>Collateral</th>
+                            <th>Principal</th>
+                            <th>Interest Rate</th>
+                            <th>Due Date</th>
+                            <th>Status</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr t-foreach="state.data.recent_contracts" t-as="r" t-key="r.id">
+                            <td t-esc="r.contract"/>
+                            <td t-esc="r.customer"/>
+                            <td t-esc="r.collateral"/>
+                            <td t-esc="fmtMoney(r.principal)"/>
+                            <td><t t-esc="r.interest_rate"/>%</td>
+                            <td t-esc="r.due_date"/>
+                            <td><span t-att-class="statusClass(r.status)" t-esc="capitalize(r.status)"/></td>
+                            <td>
+                                <button class="eye" t-on-click="() => this.openContract(r.id)">
+                                    <i class="fa fa-eye"/>
+                                </button>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div class="o_pawn_dash_loading" t-if="state.loading">Loading dashboard...</div>
+    </t>
+</templates>

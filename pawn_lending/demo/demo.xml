@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <record id="demo_company_cambodia" model="res.company">
+        <field name="name">Safe Hang Banhcham Cambodia Co., Ltd.</field>
+        <field name="country_id" ref="base.kh"/>
+        <field name="currency_id" ref="base.KHR"/>
+        <field name="phone">+85570687399</field>
+    </record>
+
+    <record id="demo_partner_customer_1" model="res.partner">
+        <field name="name">Dara Sok</field>
+        <field name="phone">+85512345678</field>
+        <field name="email">dara.sok@example.com</field>
+        <field name="country_id" ref="base.kh"/>
+        <field name="vat">140178011</field>
+    </record>
+
+    <record id="demo_partner_guarantor_1" model="res.partner">
+        <field name="name">Sokun Nhem</field>
+        <field name="phone">+85512998877</field>
+        <field name="email">sokun.nhem@example.com</field>
+        <field name="country_id" ref="base.kh"/>
+    </record>
+
+    <record id="demo_partner_customer_2" model="res.partner">
+        <field name="name">Luch Lai</field>
+        <field name="phone">+855977001122</field>
+        <field name="email">luch.lai@example.com</field>
+        <field name="country_id" ref="base.kh"/>
+        <field name="vat">150906373</field>
+    </record>
+
+    <record id="demo_rule_profile_monthly_standard" model="pawn.rule.profile">
+        <field name="name">Standard Monthly</field>
+        <field name="interest_type">monthly</field>
+        <field name="interest_rate">3.0</field>
+        <field name="penalty_rate">0.2</field>
+        <field name="max_ltv">70.0</field>
+        <field name="grace_days">5</field>
+    </record>
+
+    <record id="demo_rule_profile_daily_fast" model="pawn.rule.profile">
+        <field name="name">Daily Quick Loan</field>
+        <field name="interest_type">daily</field>
+        <field name="interest_rate">0.35</field>
+        <field name="penalty_rate">0.9</field>
+        <field name="max_ltv">65.0</field>
+        <field name="grace_days">3</field>
+    </record>
+
+    <record id="demo_contract_draft" model="pawn.contract">
+        <field name="customer_id" ref="demo_partner_customer_1"/>
+        <field name="guarantor_id" ref="demo_partner_guarantor_1"/>
+        <field name="rule_profile_id" ref="demo_rule_profile_monthly_standard"/>
+        <field name="company_id" ref="demo_company_cambodia"/>
+        <field name="principal_amount">700.0</field>
+        <field name="interest_rate">3.0</field>
+        <field name="penalty_rate">0.2</field>
+        <field name="loan_date">2026-01-10</field>
+        <field name="maturity_date">2026-02-10</field>
+        <field name="grace_days">5</field>
+        <field name="state">draft</field>
+    </record>
+
+    <record id="demo_collateral_draft_1" model="pawn.collateral">
+        <field name="contract_id" ref="demo_contract_draft"/>
+        <field name="name">22K Gold Necklace</field>
+        <field name="category">gold</field>
+        <field name="estimated_value">1000.0</field>
+        <field name="serial_number">GN-2026-001</field>
+        <field name="description">Customer presented purchase receipt and valid national ID.</field>
+    </record>
+
+    <record id="demo_contract_active" model="pawn.contract">
+        <field name="customer_id" ref="demo_partner_customer_2"/>
+        <field name="rule_profile_id" ref="demo_rule_profile_daily_fast"/>
+        <field name="company_id" ref="demo_company_cambodia"/>
+        <field name="principal_amount">150.0</field>
+        <field name="interest_rate">2.5</field>
+        <field name="penalty_rate">0.9</field>
+        <field name="loan_date">2026-08-28</field>
+        <field name="maturity_date">2026-09-06</field>
+        <field name="grace_days">1</field>
+        <field name="state">active</field>
+    </record>
+
+    <record id="demo_collateral_active_1" model="pawn.collateral">
+        <field name="contract_id" ref="demo_contract_active"/>
+        <field name="name">IPAD MINI PRO</field>
+        <field name="category">phone</field>
+        <field name="estimated_value">250.0</field>
+        <field name="serial_number">APL-IPADM-00991</field>
+        <field name="description">iCloud OFF, no SIM restriction.</field>
+    </record>
+
+    <record id="demo_contract_overdue" model="pawn.contract">
+        <field name="customer_id" ref="demo_partner_customer_1"/>
+        <field name="rule_profile_id" ref="demo_rule_profile_monthly_standard"/>
+        <field name="company_id" ref="demo_company_cambodia"/>
+        <field name="principal_amount">500.0</field>
+        <field name="interest_rate">4.0</field>
+        <field name="penalty_rate">0.3</field>
+        <field name="loan_date">2026-06-01</field>
+        <field name="maturity_date">2026-07-01</field>
+        <field name="grace_days">3</field>
+        <field name="state">overdue</field>
+    </record>
+
+    <record id="demo_collateral_overdue_1" model="pawn.collateral">
+        <field name="contract_id" ref="demo_contract_overdue"/>
+        <field name="name">Honda Click 150i</field>
+        <field name="category">motorbike</field>
+        <field name="estimated_value">900.0</field>
+        <field name="serial_number">KF35E-1164918</field>
+        <field name="description">Plate: 1LZ-6557</field>
+    </record>
+</odoo>

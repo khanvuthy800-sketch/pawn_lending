@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <record id="view_pawn_settings" model="ir.ui.view">
+        <field name="name">res.config.settings.view.form.pawn</field>
+        <field name="model">res.config.settings</field>
+        <field name="inherit_id" ref="base.res_config_settings_view_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//form" position="inside">
+                <app data-string="Pawn Management" string="Pawn Management" name="pawn_management" groups="pawn_lending.group_pawn_manager">
+                    <block title="Accounting Configuration" name="pawn_accounting_settings">
+                        <setting id="pawn_receivable_setting" string="Pawn Loan Receivable">
+                            <field name="pawn_receivable_account_id"/>
+                        </setting>
+                        <setting id="pawn_interest_income_setting" string="Interest Income Account">
+                            <field name="pawn_interest_income_account_id"/>
+                        </setting>
+                        <setting id="pawn_penalty_income_setting" string="Penalty Income Account">
+                            <field name="pawn_penalty_income_account_id"/>
+                        </setting>
+                        <setting id="pawn_inventory_setting" string="Inventory Account">
+                            <field name="pawn_inventory_account_id"/>
+                        </setting>
+                        <setting id="pawn_cash_journal_setting" string="Default Cash/Bank Journal">
+                            <field name="pawn_cash_journal_id"/>
+                        </setting>
+                    </block>
+                </app>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="action_pawn_settings" model="ir.actions.act_window">
+        <field name="name">Pawn Settings</field>
+        <field name="res_model">res.config.settings</field>
+        <field name="view_mode">form</field>
+        <field name="target">current</field>
+        <field name="context">{'module': 'pawn_lending', 'bin_size': False}</field>
+    </record>
+</odoo>

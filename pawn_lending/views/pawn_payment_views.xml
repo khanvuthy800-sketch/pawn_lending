@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <record id="view_pawn_payment_list" model="ir.ui.view">
+        <field name="name">pawn.payment.list</field>
+        <field name="model">pawn.payment</field>
+        <field name="arch" type="xml">
+            <list>
+                <field name="payment_date"/>
+                <field name="contract_id"/>
+                <field name="payment_type"/>
+                <field name="amount"/>
+                <field name="journal_id"/>
+                <field name="state"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_pawn_payment_form" model="ir.ui.view">
+        <field name="name">pawn.payment.form</field>
+        <field name="model">pawn.payment</field>
+        <field name="arch" type="xml">
+            <form string="Pawn Payment">
+                <header>
+                    <button name="action_post" type="object" string="Post" class="btn-primary" invisible="state != 'draft'"/>
+                    <button name="action_cancel" type="object" string="Cancel" invisible="state == 'cancel'"/>
+                    <button name="action_print_receipt" type="object" string="Print Receipt" invisible="state != 'posted'"/>
+                    <field name="state" widget="statusbar" statusbar_visible="draft,posted,cancel"/>
+                </header>
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="contract_id" readonly="state != 'draft'"/>
+                            <field name="payment_type" readonly="state != 'draft'"/>
+                            <field name="amount" readonly="state != 'draft'"/>
+                        </group>
+                        <group>
+                            <field name="payment_date" readonly="state != 'draft'"/>
+                            <field name="journal_id" readonly="state != 'draft'"/>
+                            <field name="account_move_id" readonly="1"/>
+                        </group>
+                    </group>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_pawn_payment" model="ir.actions.act_window">
+        <field name="name">Payments</field>
+        <field name="res_model">pawn.payment</field>
+        <field name="view_mode">list,form</field>
+    </record>
+</odoo>

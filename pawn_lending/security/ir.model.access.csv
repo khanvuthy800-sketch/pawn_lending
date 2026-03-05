@@ -1,0 +1,10 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_pawn_contract_officer,pawn.contract officer,model_pawn_contract,pawn_lending.group_pawn_officer,1,1,1,0
+access_pawn_contract_manager,pawn.contract manager,model_pawn_contract,pawn_lending.group_pawn_manager,1,1,1,1
+access_pawn_collateral_officer,pawn.collateral officer,model_pawn_collateral,pawn_lending.group_pawn_officer,1,1,1,0
+access_pawn_collateral_manager,pawn.collateral manager,model_pawn_collateral,pawn_lending.group_pawn_manager,1,1,1,1
+access_pawn_rule_profile_officer,pawn.rule.profile officer,model_pawn_rule_profile,pawn_lending.group_pawn_officer,1,0,0,0
+access_pawn_rule_profile_manager,pawn.rule.profile manager,model_pawn_rule_profile,pawn_lending.group_pawn_manager,1,1,1,1
+access_pawn_payment_officer,pawn.payment officer,model_pawn_payment,pawn_lending.group_pawn_officer,1,1,1,0
+access_pawn_payment_manager,pawn.payment manager,model_pawn_payment,pawn_lending.group_pawn_manager,1,1,1,1
+access_pawn_dashboard_manager,pawn.dashboard manager,model_pawn_dashboard,pawn_lending.group_pawn_manager,1,1,1,1

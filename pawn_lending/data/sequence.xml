@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <record id="seq_pawn_contract" model="ir.sequence">
+        <field name="name">Pawn Contract</field>
+        <field name="code">pawn.contract</field>
+        <field name="prefix">PAWN/%(year)s/</field>
+        <field name="padding">4</field>
+        <field name="company_id" eval="False"/>
+    </record>
+</odoo>

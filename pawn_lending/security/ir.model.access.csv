@@ -8,3 +8,9 @@ access_pawn_rule_profile_manager,pawn.rule.profile manager,model_pawn_rule_profi
 access_pawn_payment_officer,pawn.payment officer,model_pawn_payment,pawn_lending.group_pawn_officer,1,1,1,0
 access_pawn_payment_manager,pawn.payment manager,model_pawn_payment,pawn_lending.group_pawn_manager,1,1,1,1
 access_pawn_dashboard_manager,pawn.dashboard manager,model_pawn_dashboard,pawn_lending.group_pawn_manager,1,1,1,1
+access_pawn_collateral_image_officer,pawn.collateral.image officer,model_pawn_collateral_image,pawn_lending.group_pawn_officer,1,1,1,0
+access_pawn_collateral_image_manager,pawn.collateral.image manager,model_pawn_collateral_image,pawn_lending.group_pawn_manager,1,1,1,1
+access_pawn_redeem_wizard_officer,pawn.redeem.wizard officer,model_pawn_redeem_wizard,pawn_lending.group_pawn_officer,1,1,1,0
+access_pawn_redeem_wizard_manager,pawn.redeem.wizard manager,model_pawn_redeem_wizard,pawn_lending.group_pawn_manager,1,1,1,1
+access_pawn_sell_wizard_officer,pawn.sell.wizard officer,model_pawn_sell_wizard,pawn_lending.group_pawn_officer,1,1,1,0
+access_pawn_sell_wizard_manager,pawn.sell.wizard manager,model_pawn_sell_wizard,pawn_lending.group_pawn_manager,1,1,1,1

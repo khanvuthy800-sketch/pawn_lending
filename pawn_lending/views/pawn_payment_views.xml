@@ -37,6 +37,7 @@
                             <field name="payment_date" readonly="state != 'draft'"/>
                             <field name="journal_id" readonly="state != 'draft'"/>
                             <field name="account_move_id" readonly="1"/>
+                            <field name="invoice_id" readonly="1" invisible="not invoice_id"/>
                         </group>
                     </group>
                 </sheet>

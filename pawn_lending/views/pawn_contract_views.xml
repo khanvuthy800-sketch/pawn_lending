@@ -71,8 +71,10 @@
                     <button name="action_approve" type="object" string="Approve" class="btn-primary" groups="pawn_lending.group_pawn_manager" invisible="state != 'draft'"/>
                     <button name="action_disburse" type="object" string="Disburse" class="btn-primary" groups="pawn_lending.group_pawn_manager" invisible="state != 'approved'"/>
                     <button name="action_renew" type="object" string="Renew" groups="pawn_lending.group_pawn_manager" invisible="state not in ['active', 'overdue']"/>
-                    <button name="action_redeem" type="object" string="Redeem" groups="pawn_lending.group_pawn_manager" invisible="state not in ['active', 'overdue', 'renewed']"/>
+                    <button name="%(action_pawn_redeem_wizard)d" type="action" string="Pay &amp; Redeem" class="btn-primary" groups="pawn_lending.group_pawn_manager" invisible="state not in ['active', 'overdue', 'renewed']"/>
+                    <button name="action_redeem" type="object" string="Redeem Only" groups="pawn_lending.group_pawn_manager" invisible="state not in ['active', 'overdue', 'renewed']"/>
                     <button name="action_forfeit" type="object" string="Forfeit" groups="pawn_lending.group_pawn_manager" invisible="state not in ['active', 'overdue', 'renewed']"/>
+                    <button name="%(pawn_lending.action_pawn_sell_wizard)d" type="action" string="Sell Collateral" class="btn-primary" groups="pawn_lending.group_pawn_manager" invisible="state != 'forfeited'"/>
                     <button name="action_close" type="object" string="Close" groups="pawn_lending.group_pawn_manager" invisible="state not in ['redeemed', 'forfeited']"/>
                     <button name="action_print_ticket" type="object" string="Print Pawn Ticket" invisible="state == 'draft'"/>
                     <button name="action_print_redemption_receipt" type="object" string="Print Redemption Receipt" invisible="state not in ['redeemed', 'closed']"/>
@@ -94,8 +96,8 @@
                     <group>
                         <group>
                             <field name="name" readonly="1"/>
-                            <field name="customer_id" readonly="state != 'draft'"/>
-                            <field name="guarantor_id" readonly="state != 'draft'"/>
+                            <field name="customer_id" readonly="state != 'draft'" domain="[('is_company', '=', False)]" context="{'default_is_company': False, 'hide_company_type': True}"/>
+                            <field name="guarantor_id" readonly="state != 'draft'" domain="[('is_company', '=', False)]" context="{'default_is_company': False, 'hide_company_type': True}"/>
                             <field name="rule_profile_id" readonly="state != 'draft'"/>
                         </group>
                         <group>
@@ -118,13 +120,14 @@
                             <field name="total_paid_interest" readonly="1"/>
                             <field name="outstanding_principal" readonly="1"/>
                             <field name="penalty_amount" readonly="1"/>
+                            <field name="sold_invoice_id" invisible="not sold_invoice_id" readonly="1"/>
                         </group>
                     </group>
 
                     <notebook>
                         <page string="Collateral">
                             <field name="collateral_ids" readonly="state != 'draft'">
-                                <list editable="bottom">
+                                <list>
                                     <field name="product_id"/>
                                     <field name="name"/>
                                     <field name="category"/>
@@ -145,6 +148,53 @@
                                             <field name="description"/>
                                         </group>
                                     </group>
+                                    <notebook>
+                                        <page string="Vehicle Details" invisible="category != 'motorbike'">
+                                            <group>
+                                                <group>
+                                                    <field name="brand"/>
+                                                    <field name="model"/>
+                                                    <field name="year"/>
+                                                    <field name="color"/>
+                                                </group>
+                                                <group>
+                                                    <field name="plate_number"/>
+                                                    <field name="engine_number"/>
+                                                    <field name="frame_number"/>
+                                                    <field name="condition"/>
+                                                </group>
+                                            </group>
+                                        </page>
+                                        <page string="Extra Images">
+                                            <field name="image_ids" class="o_website_sale_image_list" context="{'default_name': name}" mode="kanban">
+                                                <kanban string="Collateral Images" class="o_attachments_previews">
+                                                    <field name="id"/>
+                                                    <field name="name"/>
+                                                    <field name="image"/>
+                                                    <templates>
+                                                        <t t-name="card">
+                                                            <div class="oe_kanban_global_click text-center">
+                                                                <div class="o_kanban_image">
+                                                                    <img t-att-src="kanban_image('pawn.collateral.image', 'image', record.id.raw_value)" t-att-alt="record.name.value" class="img-fluid"/>
+                                                                </div>
+                                                                <div class="o_kanban_details mt-2">
+                                                                    <strong><field name="name"/></strong>
+                                                                </div>
+                                                            </div>
+                                                        </t>
+                                                    </templates>
+                                                </kanban>
+                                                <form string="Collateral Image">
+                                                    <sheet>
+                                                        <group>
+                                                            <field name="name"/>
+                                                            <field name="image" widget="image"/>
+                                                        </group>
+                                                    </sheet>
+                                                </form>
+                                            </field>
+                                        </page>
+                                    </notebook>
                                 </form>
                             </field>
                         </page>

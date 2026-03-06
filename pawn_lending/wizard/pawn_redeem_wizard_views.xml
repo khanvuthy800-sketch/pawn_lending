@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_pawn_redeem_wizard_form" model="ir.ui.view">
+        <field name="name">pawn.redeem.wizard.form</field>
+        <field name="model">pawn.redeem.wizard</field>
+        <field name="arch" type="xml">
+            <form string="Pay &amp; Redeem">
+                <sheet>
+                    <group>
+                        <group string="Amounts Due">
+                            <field name="currency_id" invisible="1"/>
+                            <field name="contract_id" force_save="1"/>
+                            <field name="principal_amount" force_save="1"/>
+                            <field name="interest_amount" force_save="1"/>
+                            <field name="penalty_amount" force_save="1"/>
+                            <field name="total_amount" force_save="1" class="oe_subtotal_footer_separator o_td_label fw-bold"/>
+                        </group>
+                        <group string="Payment Info">
+                            <field name="company_id" invisible="1"/>
+                            <field name="payment_date"/>
+                            <field name="journal_id"/>
+                        </group>
+                    </group>
+                    <footer>
+                        <button name="action_confirm_redeem" string="Pay &amp; Redeem" type="object" class="btn-primary" data-hotkey="q"/>
+                        <button string="Cancel" class="btn-secondary" special="cancel" data-hotkey="x"/>
+                    </footer>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_pawn_redeem_wizard" model="ir.actions.act_window">
+        <field name="name">Pay &amp; Redeem</field>
+        <field name="res_model">pawn.redeem.wizard</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+    </record>
+</odoo>

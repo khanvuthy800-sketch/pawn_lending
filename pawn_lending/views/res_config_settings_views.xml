@@ -17,6 +17,9 @@
                         <setting id="pawn_penalty_income_setting" string="Penalty Income Account">
                             <field name="pawn_penalty_income_account_id"/>
                         </setting>
+                        <setting id="pawn_profit_account_id_setting" string="Pawn Profit Account">
+                            <field name="pawn_profit_account_id"/>
+                        </setting>
                         <setting id="pawn_inventory_setting" string="Inventory Account">
                             <field name="pawn_inventory_account_id"/>
                         </setting>

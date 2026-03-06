@@ -2,6 +2,16 @@ from odoo import api, fields, models
 from odoo.exceptions import UserError
 
 
+class PawnCollateralImage(models.Model):
+    _name = 'pawn.collateral.image'
+    _description = 'Pawn Collateral Image'
+    _order = 'id desc'
+
+    name = fields.Char(string='Name', required=True)
+    image = fields.Binary(string='Image', attachment=True, required=True)
+    collateral_id = fields.Many2one('pawn.collateral', string='Collateral', ondelete='cascade', index=True)
+
+
 class PawnCollateral(models.Model):
     _name = 'pawn.collateral'
     _description = 'Pawn Collateral'
@@ -19,10 +29,20 @@ class PawnCollateral(models.Model):
         default='other',
         required=True,
     )
+    gold_type = fields.Selection([
+        ("ring", "Ring"),   
+        ("necklace", "Necklace"),
+        ("bracelet", "Bracelet"),
+        ("earring", "Earring"),
+        ("bar", "Gold Bar"),
+        ("coin", "Gold Coin"),
+        ("other", "Other"),
+    ], string="Gold Type")
     description = fields.Text()
     estimated_value = fields.Monetary(currency_field='currency_id', required=True)
     serial_number = fields.Char()
     photo = fields.Binary(attachment=True)
+    image_ids = fields.One2many('pawn.collateral.image', 'collateral_id', string='Extra Images')
     stock_move_id = fields.Many2one('stock.move', readonly=True, copy=False)
     product_id = fields.Many2one(
         'product.product',
@@ -30,7 +50,7 @@ class PawnCollateral(models.Model):
         domain="[('type', '=', 'consu'), ('active', '=', True)]",
     )
     lot_id = fields.Many2one(
-        'stock.production.lot',
+        'stock.lot',
         string='Serial/Lot',
         copy=False,
         domain="[('product_id', '=', product_id)]",
@@ -46,6 +66,12 @@ class PawnCollateral(models.Model):
         related='lot_id.condition',
         readonly=False,
     )
+    # Phone-specific fields
+    imei = fields.Char(related='lot_id.imei', readonly=False)
+    storage = fields.Char(related='lot_id.storage', readonly=False)
+    battery_health = fields.Integer(related='lot_id.battery_health', readonly=False)
+    accessories = fields.Char(related='lot_id.accessories', readonly=False)
+    icloud_lock = fields.Boolean(related='lot_id.icloud_lock', readonly=False)
     currency_id = fields.Many2one(
         'res.currency', related='contract_id.currency_id', store=True, readonly=True
     )
@@ -85,6 +111,11 @@ class PawnCollateral(models.Model):
             'color': self.color,
             'year': self.year,
             'condition': self.condition,
+            'imei': self.imei,
+            'storage': self.storage,
+            'battery_health': self.battery_health,
+            'accessories': self.accessories,
+            'icloud_lock': self.icloud_lock,
             'owner_id': self.contract_id.customer_id.id,
             'pawn_collateral_id': self.id,
             'estimated_value': self.estimated_value,
@@ -101,7 +132,7 @@ class PawnCollateral(models.Model):
             if collateral.lot_id:
                 collateral.lot_id.sudo().write(vals)
             else:
-                lot = self.env['stock.production.lot'].sudo().create(vals)
+                lot = self.env['stock.lot'].sudo().create(vals)
                 collateral.lot_id = lot.id
 
     @api.model_create_multi
@@ -125,6 +156,11 @@ class PawnCollateral(models.Model):
             'color',
             'year',
             'condition',
+            'imei',
+            'storage',
+            'battery_health',
+            'accessories',
+            'icloud_lock',
             'estimated_value',
             'photo',
         }
@@ -176,11 +212,10 @@ class PawnCollateral(models.Model):
                 'picking_type_id': picking_type.id if picking_type else False,
                 'origin': self.contract_id.name,
                 'company_id': self.contract_id.company_id.id,
-                'restrict_lot_id': self.lot_id.id,
                 'move_line_ids': [(0, 0, {
                     'product_id': product.id,
                     'lot_id': self.lot_id.id,
-                    'qty_done': 1.0,
+                    'quantity': 1.0,
                     'product_uom_id': product.uom_id.id,
                     'location_id': source_location.id,
                     'location_dest_id': dest_location.id,

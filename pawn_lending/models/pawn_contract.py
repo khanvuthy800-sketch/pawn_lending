@@ -57,6 +57,7 @@ class PawnContract(models.Model):
     payment_ids = fields.One2many('pawn.payment', 'contract_id', string='Payments')
     disbursement_move_id = fields.Many2one('account.move', readonly=True, copy=False)
     forfeit_move_id = fields.Many2one('account.move', readonly=True, copy=False)
+    sold_invoice_id = fields.Many2one('account.move', readonly=True, copy=False)
 
     total_interest_due = fields.Monetary(compute='_compute_financials', currency_field='currency_id')
     total_paid_interest = fields.Monetary(compute='_compute_financials', currency_field='currency_id')
@@ -198,26 +199,40 @@ class PawnContract(models.Model):
 
     @api.model
     def _get_default_journal(self):
+        company = self.company_id if self else self.env.company
         journal_id = self.env['ir.config_parameter'].sudo().get_param('pawn_management.cash_journal_id')
         if journal_id:
-            return self.env['account.journal'].browse(int(journal_id))
+            journal = self.env['account.journal'].sudo().browse(int(journal_id))
+            if journal.exists() and journal.company_id.id in (False, company.id):
+                return journal.with_env(self.env)
+                
         return self.env['account.journal'].search(
-            [('type', 'in', ['cash', 'bank']), ('company_id', '=', self.env.company.id)],
+            [('type', 'in', ['cash', 'bank']), ('company_id', '=', company.id)],
             limit=1,
         )
 
+    @api.model
     def _get_config_accounts(self):
+        company = self.company_id if self else self.env.company
         params = self.env['ir.config_parameter'].sudo()
         mapping = {
             'receivable': 'pawn_management.receivable_account_id',
             'interest_income': 'pawn_management.interest_income_account_id',
             'penalty_income': 'pawn_management.penalty_income_account_id',
+            'profit': 'pawn_management.profit_account_id',
             'inventory': 'pawn_management.inventory_account_id',
         }
         accounts = {}
         for key, param_key in mapping.items():
             account_id = params.get_param(param_key)
-            accounts[key] = self.env['account.account'].browse(int(account_id)) if account_id else False
+            if account_id:
+                account = self.env['account.account'].sudo().browse(int(account_id))
+                if account.exists() and (not account.company_ids or company.id in account.company_ids.ids):
+                    accounts[key] = account.with_env(self.env)
+                else:
+                    accounts[key] = False
+            else:
+                accounts[key] = False
         return accounts
 
     def _check_manager_rights(self):

@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_partner_form_inherit_pawn_lending" model="ir.ui.view">
+        <field name="name">res.partner.form.inherit.pawn.lending</field>
+        <field name="model">res.partner</field>
+        <field name="inherit_id" ref="base.view_partner_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='company_type']" position="attributes">
+                <attribute name="invisible">context.get('hide_company_type', False)</attribute>
+            </xpath>
+            <xpath expr="//field[@name='vat']" position="after">
+                <field name="national_id_number" invisible="is_company"/>
+            </xpath>
+            <xpath expr="//notebook" position="inside">
+                <page string="Identification" invisible="is_company">
+                    <group>
+                        <group string="ID Details">
+                            <field name="national_id_number" widget="char" readonly="1"/>
+                        </group>
+                        <group string="ID Images">
+                            <field name="national_id_image_front" widget="image" options="{'size': [120, 80]}"/>
+                            <field name="national_id_image_back" widget="image" options="{'size': [120, 80]}"/>
+                        </group>
+                    </group>
+                </page>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="view_res_partner_filter_inherit_pawn_lending" model="ir.ui.view">
+        <field name="name">res.partner.search.inherit.pawn.lending</field>
+        <field name="model">res.partner</field>
+        <field name="inherit_id" ref="base.view_res_partner_filter"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='name']" position="after">
+                <field name="national_id_number" string="National ID / Passport" filter_domain="[('national_id_number', 'ilike', self)]"/>
+            </xpath>
+        </field>
+    </record>
+</odoo>

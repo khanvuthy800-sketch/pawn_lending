@@ -38,6 +38,70 @@
                     <group>
                         <field name="description"/>
                     </group>
+                    <notebook>
+                        <page string="Vehicle Details" invisible="category != 'motorbike'">
+                            <group>
+                                <group>
+                                    <field name="brand"/>
+                                    <field name="model"/>
+                                    <field name="year"/>
+                                    <field name="color"/>
+                                </group>
+                                <group>
+                                    <field name="plate_number"/>
+                                    <field name="engine_number"/>
+                                    <field name="frame_number"/>
+                                    <field name="condition"/>
+                                </group>
+                            </group>
+                        </page>
+                        <page string="Phone Details" invisible="category != 'phone'">
+                            <group>
+                                <group>
+                                    <field name="imei"/>
+                                    <field name="brand"/>
+                                    <field name="model"/>
+                                    <field name="storage"/>
+                                    <field name="color"/>
+                                </group>
+                                <group>
+                                    <field name="condition"/>
+                                    <field name="battery_health"/>
+                                    <field name="accessories"/>
+                                    <field name="icloud_lock"/>
+                                </group>
+                            </group>
+                        </page>
+                        <page string="Extra Images">
+                            <field name="image_ids" class="o_website_sale_image_list" context="{'default_name': name}" mode="kanban">
+                                <kanban string="Collateral Images" class="o_attachments_previews">
+                                    <field name="id"/>
+                                    <field name="name"/>
+                                    <field name="image"/>
+                                    <templates>
+                                        <t t-name="card">
+                                            <div class="oe_kanban_global_click text-center">
+                                                <div class="o_kanban_image">
+                                                    <img t-att-src="kanban_image('pawn.collateral.image', 'image', record.id.raw_value)" t-att-alt="record.name.value" class="img-fluid"/>
+                                                </div>
+                                                <div class="o_kanban_details mt-2">
+                                                    <strong><field name="name"/></strong>
+                                                </div>
+                                            </div>
+                                        </t>
+                                    </templates>
+                                </kanban>
+                                <form string="Collateral Image">
+                                    <sheet>
+                                        <group>
+                                            <field name="name"/>
+                                            <field name="image" widget="image"/>
+                                        </group>
+                                    </sheet>
+                                </form>
+                            </field>
+                        </page>
+                    </notebook>
                 </sheet>
             </form>
         </field>

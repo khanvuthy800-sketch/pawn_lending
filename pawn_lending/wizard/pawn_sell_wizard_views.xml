@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_pawn_sell_wizard_form" model="ir.ui.view">
+        <field name="name">pawn.sell.wizard.form</field>
+        <field name="model">pawn.sell.wizard</field>
+        <field name="arch" type="xml">
+            <form string="Sell Forfeited Collateral">
+                <sheet>
+                    <group>
+                        <group string="Sale Details">
+                            <field name="currency_id" invisible="1"/>
+                            <field name="company_id" invisible="1"/>
+                            <field name="contract_id" force_save="1"/>
+                            <field name="buyer_id"/>
+                            <field name="sale_date"/>
+                        </group>
+                        <group string="Amounts">
+                            <field name="principal_amount" force_save="1"/>
+                            <field name="sale_price"/>
+                        </group>
+                    </group>
+                    <footer>
+                        <button name="action_confirm_sell" string="Confirm Sale" type="object" class="btn-primary" data-hotkey="q"/>
+                        <button string="Cancel" class="btn-secondary" special="cancel" data-hotkey="x"/>
+                    </footer>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_pawn_sell_wizard" model="ir.actions.act_window">
+        <field name="name">Sell Collateral</field>
+        <field name="res_model">pawn.sell.wizard</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+    </record>
+</odoo>

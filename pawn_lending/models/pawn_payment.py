@@ -27,6 +27,7 @@ class PawnPayment(models.Model):
         domain="[('type', 'in', ('cash', 'bank')), ('company_id', '=', contract_id.company_id)]",
     )
     account_move_id = fields.Many2one('account.move', readonly=True, copy=False)
+    invoice_id = fields.Many2one('account.move', string='Invoice', readonly=True, copy=False)
     state = fields.Selection(
         selection=[('draft', 'Draft'), ('posted', 'Posted'), ('cancel', 'Cancelled')],
         default='draft',
@@ -52,8 +53,10 @@ class PawnPayment(models.Model):
         for payment in self.filtered(lambda p: p.state == 'draft'):
             if payment.contract_id.state not in ('active', 'overdue', 'renewed'):
                 raise UserError('Payments can only be posted for active, overdue, or renewed contracts.')
-            move = payment._create_payment_move()
+            move, invoice = payment._create_payment_move()
             payment.account_move_id = move.id
+            if invoice:
+                payment.invoice_id = invoice.id
             payment.state = 'posted'
 
     def action_cancel(self):
@@ -70,6 +73,8 @@ class PawnPayment(models.Model):
             raise UserError('Payment journal must have a default account.')
 
         accounts = self.contract_id._get_config_accounts()
+        invoice = False
+
         if self.payment_type == 'interest':
             credit_account = accounts['interest_income']
         elif self.payment_type == 'penalty':
@@ -79,6 +84,38 @@ class PawnPayment(models.Model):
 
         if not credit_account:
             raise UserError('Required accounts are missing in Pawn settings.')
+
+        if self.payment_type == 'interest':
+            sale_journal = self.env['account.journal'].search([
+                ('type', '=', 'sale'), 
+                ('company_id', '=', self.contract_id.company_id.id)
+            ], limit=1)
+            if not sale_journal:
+                raise UserError('No Sales Journal found to create an invoice for interest payment.')
+
+            invoice = self.env['account.move'].create({
+                'move_type': 'out_invoice',
+                'partner_id': self.contract_id.customer_id.id,
+                'journal_id': sale_journal.id,
+                'invoice_date': self.payment_date,
+                'ref': f'{self.contract_id.name} - Interest Payment',
+                'invoice_line_ids': [
+                    (0, 0, {
+                        'name': f'Interest Payment for {self.contract_id.name}',
+                        'quantity': 1,
+                        'price_unit': self.amount,
+                        'account_id': credit_account.id,
+                    })
+                ]
+            })
+            invoice.action_post()
+            
+            # The payment move should credit the receivable account to reconcile with the invoice
+            receivable_lines = invoice.line_ids.filtered(lambda l: l.account_id.account_type == 'asset_receivable')
+            if receivable_lines:
+                credit_account = receivable_lines[0].account_id
+            else:
+                credit_account = accounts['receivable']
 
         move = self.env['account.move'].create(
             {
@@ -105,4 +142,13 @@ class PawnPayment(models.Model):
             }
         )
         move.action_post()
-        return move
+
+        if invoice:
+            # Reconcile the payment move with the invoice
+            lines_to_reconcile = (invoice.line_ids + move.line_ids).filtered(
+                lambda l: l.account_id == credit_account and not l.reconciled
+            )
+            if len(lines_to_reconcile) > 1:
+                lines_to_reconcile.reconcile()
+
+        return move, invoice
